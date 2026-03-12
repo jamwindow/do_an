@@ -23,13 +23,15 @@ void motor_set_pwm(float uL, float uR)
     if(pwmL < 20) pwmL = 0;
     if(pwmR < 20) pwmR = 0;
 
-    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9,
+    HAL_GPIO_WritePin(GPIOD, EnableLeft_Pin,
                       (uL >= 0) ? GPIO_PIN_SET : GPIO_PIN_RESET);
 
-    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11,
+    HAL_GPIO_WritePin(GPIOD, EnableRight_Pin,
                       (uR >= 0) ? GPIO_PIN_SET : GPIO_PIN_RESET);
 
     __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, pwmL);
-    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, pwmR);
+    __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, pwmR);
+
+
 }
 

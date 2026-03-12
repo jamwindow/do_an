@@ -22,8 +22,11 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "uart.h"
 #include "control.h"
+#include "uart.h"
+
+
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -64,9 +67,6 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
-
-
-
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -93,15 +93,17 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
-  MX_TIM3_Init();
   MX_TIM6_Init();
-  MX_USART2_UART_Init();
+  MX_TIM5_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim6);
   HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
-  HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
+  HAL_TIM_Encoder_Start(&htim5, TIM_CHANNEL_ALL);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
   control_init();
   /* USER CODE END 2 */
 
@@ -166,14 +168,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if(huart->Instance == USART2)
+    if(huart->Instance == USART1)
     {
         float v = rx_packet.v;
         float w = rx_packet.w;
 
         set_cmd_vel(v,w);
 
-        HAL_UART_Receive_IT(&huart2, rx_buf, sizeof(rx_buf));
+        HAL_UART_Receive_IT(&huart1, rx_buf, sizeof(rx_buf));
     }
 }
 /* USER CODE END 4 */

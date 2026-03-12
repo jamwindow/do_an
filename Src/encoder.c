@@ -21,8 +21,8 @@ static int32_t lastR = 0;
 
 void encoder_update(float dt)
 {
-	int32_t cntL = __HAL_TIM_GET_COUNTER(&htim2);
-	int32_t cntR = __HAL_TIM_GET_COUNTER(&htim3);
+	int32_t cntL = __HAL_TIM_GET_COUNTER(&htim5);// left
+	int32_t cntR = __HAL_TIM_GET_COUNTER(&htim2);// right
 
 	int32_t dL = cntL - lastL;
 	int32_t dR = cntR - lastR;

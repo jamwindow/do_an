@@ -58,6 +58,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define EnableRight_Pin GPIO_PIN_0
+#define EnableRight_GPIO_Port GPIOD
+#define EnableLeft_Pin GPIO_PIN_1
+#define EnableLeft_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
