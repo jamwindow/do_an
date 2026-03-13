@@ -12,30 +12,22 @@
 #include "diff_drive.h"
 #include <math.h>
 
-typedef struct{
-    float kp,ki,kd;
-    float integral;
-    float prev_err;
-    float prev_deriv;
-}PID;
+#include "stm32f4xx_hal.h"
 
-typedef struct{
-    float z1;
-    float z2;
-    float beta1;
-    float beta2;
-}ESO;
 
-typedef struct{
-    float J;
-    float B;
-    float Kt;
-}Motor;
 
-Motor motor = {0.02,0.2,1.0};
-
-PID pidL,pidR;
-ESO esoL,esoR;
+//
+//Motor motor = {0.02,0.2,1.0};
+//
+//PID pidL,pidR;
+//ESO esoL,esoR;
+//
+//float cmd_v = 0;
+//float cmd_w = 0;
+//
+//uint32_t last_cmd_time = 0;
+//
+//#define CMD_TIMEOUT_MS 200
 
 float pid_update(PID *pid,float ref,float meas,float dt)
 {
@@ -111,18 +103,48 @@ void control_init()
 
 void control_loop()
 {
-    float dt=0.001;
+//    float dt=0.001;
 
-    encoder_update(dt);
+    if(HAL_GetTick() - last_cmd_time > CMD_TIMEOUT_MS)
+    {
+        cmd_v = 0;
+        cmd_w = 0;
+    }
+
+    encoder_update(CONTROL_DT);
+
+    diff_drive_compute(cmd_v, cmd_w);
+
+    /* wheel speed limit */
+    if(wL_ref > MAX_WHEEL_SPEED)  wL_ref = MAX_WHEEL_SPEED;
+    if(wL_ref < -MAX_WHEEL_SPEED) wL_ref = -MAX_WHEEL_SPEED;
+
+    if(wR_ref > MAX_WHEEL_SPEED)  wR_ref = MAX_WHEEL_SPEED;
+    if(wR_ref < -MAX_WHEEL_SPEED) wR_ref = -MAX_WHEEL_SPEED;
+
+    /* acceleration limit */
+    static float prev_wL = 0;
+    static float prev_wR = 0;
+
+    float max_step = MAX_ACCEL * CONTROL_DT;
+
+    if(wL_ref - prev_wL > max_step)  wL_ref = prev_wL + max_step;
+    if(wL_ref - prev_wL < -max_step) wL_ref = prev_wL - max_step;
+
+    if(wR_ref - prev_wR > max_step)  wR_ref = prev_wR + max_step;
+    if(wR_ref - prev_wR < -max_step) wR_ref = prev_wR - max_step;
+
+    prev_wL = wL_ref;
+    prev_wR = wR_ref;
 
     static float prevL = 0;
     static float prevR = 0;
 
-    float u_ffL = feedforward(wL_ref,&prevL,dt);
-    float u_ffR = feedforward(wR_ref,&prevR,dt);
+    float u_ffL = feedforward(wL_ref,&prevL,CONTROL_DT);
+    float u_ffR = feedforward(wR_ref,&prevR,CONTROL_DT);
 
-    float uL=control_step(&pidL,&esoL,wL_ref,wL_meas,u_ffL,dt);
-    float uR=control_step(&pidR,&esoR,wR_ref,wR_meas,u_ffR,dt);
+    float uL=control_step(&pidL,&esoL,wL_ref,wL_meas,u_ffL,CONTROL_DT);
+    float uR=control_step(&pidR,&esoR,wR_ref,wR_meas,u_ffR,CONTROL_DT);
 
     motor_set_pwm(uL,uR);
 }

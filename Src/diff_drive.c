@@ -8,11 +8,11 @@
 
 #include "diff_drive.h"
 
-float wheel_base = 0.5;
-float wheel_radius = 0.1;
-
-float wL_ref = 0;
-float wR_ref = 0;
+//float wheel_base = 0.5;
+//float wheel_radius = 0.1;
+//
+//float wL_ref = 0;
+//float wR_ref = 0;
 
 void diff_drive_compute(float v, float w)
 {

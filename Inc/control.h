@@ -8,6 +8,9 @@
 #ifndef INC_CONTROL_H_
 #define INC_CONTROL_H_
 
+#include"global.h"
+#include"diff_drive.h"
+
 void control_init();
 void control_loop();
 
